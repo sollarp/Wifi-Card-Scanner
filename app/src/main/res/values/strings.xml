@@ -15,9 +15,10 @@
     <string name="pre_shared_key">Pre-Shared Key</string>
     <string name="shared_key">keys</string>
     <string name="Default" />
+    <string name="Security">Security</string>
     <string-array name="shared_keys">
-        <item>WPA-PSK</item>
         <item>Wep</item>
-        <item>WPA2-PSK</item>
+        <item>WPA2</item>
+        <item>WPA</item>
     </string-array>
 </resources>

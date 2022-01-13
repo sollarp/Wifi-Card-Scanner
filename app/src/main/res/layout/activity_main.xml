@@ -131,7 +131,8 @@
                 android:layout_weight="0"
                 android:text="@string/select_or_input_name"
                 android:textColor="#757575"
-                android:textSize="18sp" />
+                android:textSize="18sp"
+                tools:ignore="LabelFor" />
 
 
         </com.google.android.material.textfield.TextInputLayout>
@@ -156,7 +157,8 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="0"
                 android:text="Default"
-                android:textColor="#757575" />
+                android:textColor="#757575"
+                tools:ignore="LabelFor" />
 
 
         </com.google.android.material.textfield.TextInputLayout>
