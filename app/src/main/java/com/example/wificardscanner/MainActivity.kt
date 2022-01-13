@@ -41,6 +41,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         photoBtn.setOnClickListener {
+            // [Check camera permission and start camera]
             if (ContextCompat.checkSelfPermission(
                     this,
                     android.Manifest.permission.CAMERA
@@ -61,13 +62,14 @@ class MainActivity : AppCompatActivity() {
         }
         submitButton.setOnClickListener {
             generateQR()
-            Toast.makeText(this@MainActivity, "No Image was selected", Toast.LENGTH_SHORT).show()
         }
+        // [Get list of items from strings.xml and adding array adapter to AutoCompleteTextView]
         val keyLists: Array<String> = resources.getStringArray(R.array.shared_keys)
         val listAdapter: ArrayAdapter<String> =
             ArrayAdapter(this, R.layout.dropdown_item, keyLists)
         val autocompleteTV3 = findViewById<AutoCompleteTextView>(R.id.autoCompleteTextView3)
         autocompleteTV3.setAdapter(listAdapter)
+        // [Listen for selected item in drop down menu]
         autocompleteTV3.onItemClickListener =
             AdapterView.OnItemClickListener { parent, view, position, id ->
                 val selectedItemText3 = parent.getItemAtPosition(position)
@@ -95,6 +97,7 @@ class MainActivity : AppCompatActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == Activity.RESULT_OK) {
+            // [Get image bitmap and set it to imageView]
             val thumbNail: Bitmap = data!!.extras!!.get("data") as Bitmap
             imageView.setImageBitmap(thumbNail)
             imageFromBitmap(thumbNail)
@@ -128,6 +131,7 @@ class MainActivity : AppCompatActivity() {
                 // ...
             }
     }
+    // [Get elements=words from array and convert list to mutablelist]
     private fun append(arr: Array<String>, element: String): Array<String> {
         val list: MutableList<String> = arr.toMutableList()
         list.add(element)
@@ -137,6 +141,7 @@ class MainActivity : AppCompatActivity() {
         txtView.text = resultText
         allItemListArray.clear()
         var listItem: Array<String> = arrayOf()
+        // [Iterate through blocks than lines than elements to get list of words]
         for (inBlock in result.result.textBlocks) {
             for (inLine in inBlock.lines) {
                 for (element in inLine.elements) {
@@ -146,6 +151,7 @@ class MainActivity : AppCompatActivity() {
         }
         addElementsToMenus(listItem)
     }
+    // [Add ]
     private fun addElementsToMenus(listItem: Array<String>) {
         val arrayAdapter: ArrayAdapter<String> = ArrayAdapter(this, R.layout.dropdown_item, listItem)
         val autocompleteTV = findViewById<AutoCompleteTextView>(R.id.autoCompleteTextView)
@@ -153,7 +159,7 @@ class MainActivity : AppCompatActivity() {
 
         autocompleteTV.onItemClickListener =
             AdapterView.OnItemClickListener { parent, view, position, id ->
-                val selectedItemText = parent.getItemAtPosition(position)
+                ssid = parent.getItemAtPosition(position).toString()
                 testView.text = "selected: "
                 //Toast.makeText(this@MainActivity, selectedItemText.toString(), Toast.LENGTH_SHORT).show()
 
@@ -164,12 +170,12 @@ class MainActivity : AppCompatActivity() {
 
         autocompleteTV2.onItemClickListener =
             AdapterView.OnItemClickListener { parent, view, position, id ->
-                val selectedItemText2 = parent.getItemAtPosition(position)
+                password = parent.getItemAtPosition(position).toString()
 
             }
     }
     private fun generateQR () {
-
+        Toast.makeText(this@MainActivity, ssid, Toast.LENGTH_SHORT).show()
         val textQR = "WIFI:T:${preSharedKey};S:${ssid};P:${password};;"
 
         val size = 512 //pixels
