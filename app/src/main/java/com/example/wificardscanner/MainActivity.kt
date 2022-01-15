@@ -5,29 +5,22 @@ import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
-import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.MediaStore
-import android.view.View
 import android.widget.*
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.google.android.gms.tasks.Task
-import com.google.android.material.textfield.TextInputLayout
-import com.google.mlkit.vision.text.TextRecognition
-import com.google.mlkit.vision.text.latin.TextRecognizerOptions
 import kotlinx.android.synthetic.main.activity_main.*
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.text.Text
-import com.google.zxing.BarcodeFormat
-import com.google.zxing.EncodeHintType
-import com.google.zxing.qrcode.QRCodeWriter
 
 class MainActivity : AppCompatActivity() {
 
-    private var allItemListArray = ArrayList<ItemContainer>()
-    private lateinit var result: Task<Text>
+    private lateinit var resultBlock: Task<Text>
+    private val generateQR = GenerateQR()
+    private val textProcessor = TextProcessor()
     private var ssid = ""
     private var password = ""
     private var preSharedKey = "WPA2"
@@ -77,7 +70,6 @@ class MainActivity : AppCompatActivity() {
             }
 
     }
-
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<out String>,
@@ -108,52 +100,35 @@ class MainActivity : AppCompatActivity() {
 
     private fun imageFromBitmap(bitmap: Bitmap) {
         val rotationDegrees = 0
+        var resultText = String()
+        // [START get_detector_default]
+        // [END get_detector_default]
+        // [START run_detector]
         // [START image_from_bitmap]
         val image = InputImage.fromBitmap(bitmap, rotationDegrees)
         // [END image_from_bitmap]
-        detectBtn.setOnClickListener {
-            recognizeText(image)
-        }
-    }
-
-    private fun recognizeText(image: InputImage) {
-        // [START get_detector_default]
-        val recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
-        // [END get_detector_default]
-        // [START run_detector]
-        result = recognizer.process(image).addOnSuccessListener { visionText ->
+        val recognizer =  textProcessor.imageToText(image,txtView)
+        resultBlock = recognizer.process(image).addOnSuccessListener { visionText ->
             txtView.text = visionText.text
-            val resultText = visionText.text
-            textProcess(resultText)
+            resultText = visionText.text
         }
             .addOnFailureListener { e ->
                 // Task failed with an exception
                 // ...
             }
-    }
-    // [Get elements=words from array and convert list to mutablelist]
-    private fun append(arr: Array<String>, element: String): Array<String> {
-        val list: MutableList<String> = arr.toMutableList()
-        list.add(element)
-        return list.toTypedArray()
-    }
-    private fun textProcess(resultText: String) {
-        txtView.text = resultText
-        allItemListArray.clear()
-        var listItem: Array<String> = arrayOf()
-        // [Iterate through blocks than lines than elements to get list of words]
-        for (inBlock in result.result.textBlocks) {
-            for (inLine in inBlock.lines) {
-                for (element in inLine.elements) {
-                    listItem = append(listItem, element.text)
-                }
-            }
+        detectBtn.setOnClickListener {
+            textProcess()
         }
+    }
+    private fun textProcess() {
+        val listItem = textProcessor.detector(resultBlock)
         addElementsToMenus(listItem)
     }
     // [Add ]
+    @SuppressLint("SetTextI18n")
     private fun addElementsToMenus(listItem: Array<String>) {
-        val arrayAdapter: ArrayAdapter<String> = ArrayAdapter(this, R.layout.dropdown_item, listItem)
+        val arrayAdapter: ArrayAdapter<String> =
+            ArrayAdapter(this, R.layout.dropdown_item, listItem)
         val autocompleteTV = findViewById<AutoCompleteTextView>(R.id.autoCompleteTextView)
         autocompleteTV.setAdapter(arrayAdapter)
 
@@ -162,7 +137,6 @@ class MainActivity : AppCompatActivity() {
                 ssid = parent.getItemAtPosition(position).toString()
                 testView.text = "selected: "
                 //Toast.makeText(this@MainActivity, selectedItemText.toString(), Toast.LENGTH_SHORT).show()
-
             }
         val arrayAdapter2: ArrayAdapter<String> = ArrayAdapter(this, R.layout.dropdown_item, listItem)
         val autocompleteTV2 = findViewById<AutoCompleteTextView>(R.id.autoCompleteTextView2)
@@ -175,23 +149,8 @@ class MainActivity : AppCompatActivity() {
             }
     }
     private fun generateQR () {
-        Toast.makeText(this@MainActivity, ssid, Toast.LENGTH_SHORT).show()
-        val textQR = "WIFI:T:${preSharedKey};S:${ssid};P:${password};;"
-
-        val size = 512 //pixels
-        //val qrCodeContent = "WIFI:S:$ssid;T:WPA;P:$password;;"
-
-        val hints = hashMapOf<EncodeHintType, Int>().also { it[EncodeHintType.MARGIN] = 1 } // Make the QR code buffer border narrower
-        val bits = QRCodeWriter().encode(textQR, BarcodeFormat.QR_CODE, size, size)
-        val qrImage = Bitmap.createBitmap(size, size, Bitmap.Config.RGB_565).also {
-            for (x in 0 until size) {
-                for (y in 0 until size) {
-                    it.setPixel(x, y, if (bits[x, y]) Color.BLACK else Color.WHITE)
-                }
-            }
-        }
+        val qrImage = generateQR.generator(preSharedKey,ssid,password)
         imageView.setImageBitmap(qrImage)
-
     }
 }
 
