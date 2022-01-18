@@ -113,7 +113,7 @@ This is an example of how to list things you need to use the software and how to
 - App is useful for Network Engineers dealing with multiple   WiFi     access point installations where network name and password different. Then able connect users by scanning WiFi QR without manually entering network details.
 - People struggling 
 
-_For more examples, please refer to the [Documentation](https://example.com)_
+_For more examples, please refer to the [Documentation](https://developer.android.com/kotlin)_
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
