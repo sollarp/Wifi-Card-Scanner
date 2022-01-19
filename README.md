@@ -81,7 +81,7 @@ To get a local copy up and running follow these simple example steps.
 ## Usage
 
 - App is useful for Network Engineers dealing with multiple   WiFi     access point installations where network name and password different. Then able connect users by scanning WiFi QR without manually entering network details.
-- People struggling 
+- People struggling with modern devices (not technical).
 
 _For more examples, please refer to the [Documentation](https://developer.android.com/kotlin)_
 
