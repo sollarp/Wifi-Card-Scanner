@@ -45,7 +45,6 @@ App takes image using device built in camera and using Text API to collect Wifi 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
 
-
 ### Built With
 
 * [Kotlin](https://kotlinlang.org/)
@@ -60,36 +59,7 @@ App takes image using device built in camera and using Text API to collect Wifi 
 
 To get a local copy up and running follow these simple example steps.
 
-### Permissons and Dependencies 
 
-This is an example of how to list things you need to use the software and how to install them.
-* AndroidManifest
-  ```sh
-  <uses-permission android:name="android.permission.INTERNET"/>
-  <uses-permission android:name="android.permission.CAMERA" />
-  <uses-feature android:name="android.hardware.camera"
-      android:required="true" />
-  ```
-
-* Dependencies
-  ```sh
-  implementation 'com.google.android.gms:play-services-mlkit-text-recognition:17.0.1'
-  
-  implementation 'androidx.constraintlayout:constraintlayout:2.1.0'
-  implementation 'com.google.zxing:core:3.4.0'
-
-  plugins {
-    id 'com.android.application'
-    id 'kotlin-android'
-    id 'kotlin-android-extensions'
-    }
-  android {
-    compileSdkVersion 31
-    buildToolsVersion '30.0.2'
-    }
-
-
-  ```
 
 ### Installation
 
