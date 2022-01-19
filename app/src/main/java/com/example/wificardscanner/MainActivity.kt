@@ -1,17 +1,24 @@
 package com.example.wificardscanner
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
+import android.media.MediaRecorder.VideoSource.CAMERA
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.MediaStore
+import android.util.Log
+import android.view.View
 import android.widget.*
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import com.example.wificardscanner.databinding.ActivityMainBinding
 import com.google.android.gms.tasks.Task
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.activity_main.*
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.text.Text
@@ -21,37 +28,23 @@ class MainActivity : AppCompatActivity() {
     private lateinit var resultBlock: Task<Text>
     private val generateQR = GenerateQR()
     private val textProcessor = TextProcessor()
+    private val autoConnet = AutoConnectToWifi()
     private var ssid = ""
     private var password = ""
     private var preSharedKey = "WPA2"
 
-    companion object {
-        private const val CAMERA_PERMISSON_CODE = 1
-        private const val CAMERA = 2
-    }
+    private lateinit var layout: View
+    private lateinit var binding: ActivityMainBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        val view = binding.root.rootView
+        layout = binding.relativeLayout
+        setContentView(view)
+
         photoBtn.setOnClickListener {
-            // [Check camera permission and start camera]
-            if (ContextCompat.checkSelfPermission(
-                    this,
-                    android.Manifest.permission.CAMERA
-                ) == PackageManager.PERMISSION_GRANTED
-            ) {
-                val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-                startActivityForResult(intent, CAMERA)
-            } else {
-                ActivityCompat.requestPermissions(
-                    this,
-                    arrayOf(android.Manifest.permission.CAMERA),
-                    CAMERA_PERMISSON_CODE
-                )
-            }
-        }
-        detectBtn.setOnClickListener {
-            Toast.makeText(this@MainActivity, "No Image was selected", Toast.LENGTH_SHORT).show()
+            onClickRequestPermission(view)
         }
         submitButton.setOnClickListener {
             generateQR()
@@ -70,22 +63,49 @@ class MainActivity : AppCompatActivity() {
             }
 
     }
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == CAMERA_PERMISSON_CODE) {
-            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+    private val requestPermissionLauncher =
+        registerForActivityResult(
+            ActivityResultContracts.RequestPermission()
+        ) { isGranted: Boolean ->
+            if (isGranted) {
+                Log.i("Permission: ", "Granted")
+            } else {
+                Log.i("Permission: ", "Denied")
+            }
+        }
+    private fun onClickRequestPermission(view: View) {
+        when {
+            ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.CAMERA
+            ) == PackageManager.PERMISSION_GRANTED -> {
                 val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
                 startActivityForResult(intent, CAMERA)
-            } else {
-                Toast.makeText(this@MainActivity, "Permission Denied", Toast.LENGTH_SHORT).show()
+            }
+
+            ActivityCompat.shouldShowRequestPermissionRationale(
+                this,
+                Manifest.permission.CAMERA
+            ) -> {
+                layout.showSnackbar(
+                    view,
+                    getString(R.string.permission_required),
+                    Snackbar.LENGTH_INDEFINITE,
+                    getString(R.string.ok)
+                ) {
+                    requestPermissionLauncher.launch(
+                        Manifest.permission.CAMERA
+                    )
+                }
+            }
+
+            else -> {
+                requestPermissionLauncher.launch(
+                    Manifest.permission.CAMERA
+                )
             }
         }
     }
-
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == Activity.RESULT_OK) {
@@ -97,7 +117,6 @@ class MainActivity : AppCompatActivity() {
             Toast.makeText(this@MainActivity, "something went wrong", Toast.LENGTH_SHORT).show()
         }
     }
-
     private fun imageFromBitmap(bitmap: Bitmap) {
         val rotationDegrees = 0
         var resultText = String()
@@ -111,14 +130,12 @@ class MainActivity : AppCompatActivity() {
         resultBlock = recognizer.process(image).addOnSuccessListener { visionText ->
             txtView.text = visionText.text
             resultText = visionText.text
+            textProcess()
         }
             .addOnFailureListener { e ->
                 // Task failed with an exception
                 // ...
             }
-        detectBtn.setOnClickListener {
-            textProcess()
-        }
     }
     private fun textProcess() {
         val listItem = textProcessor.detector(resultBlock)
@@ -135,7 +152,6 @@ class MainActivity : AppCompatActivity() {
         autocompleteTV.onItemClickListener =
             AdapterView.OnItemClickListener { parent, view, position, id ->
                 ssid = parent.getItemAtPosition(position).toString()
-                testView.text = "selected: "
                 //Toast.makeText(this@MainActivity, selectedItemText.toString(), Toast.LENGTH_SHORT).show()
             }
         val arrayAdapter2: ArrayAdapter<String> = ArrayAdapter(this, R.layout.dropdown_item, listItem)
@@ -151,9 +167,26 @@ class MainActivity : AppCompatActivity() {
     private fun generateQR () {
         val qrImage = generateQR.generator(preSharedKey,ssid,password)
         imageView.setImageBitmap(qrImage)
+        val context = applicationContext
+        autoConnet.wifiConnect(ssid, password, context)
     }
 }
-
+fun View.showSnackbar(
+    view: View,
+    msg: String,
+    length: Int,
+    actionMessage: CharSequence?,
+    action: (View) -> Unit
+) {
+    val snackbar = Snackbar.make(view, msg, length)
+    if (actionMessage != null) {
+        snackbar.setAction(actionMessage) {
+            action(this)
+        }.show()
+    } else {
+        snackbar.show()
+    }
+}
 
 
 

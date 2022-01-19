@@ -16,6 +16,10 @@
     <string name="shared_key">keys</string>
     <string name="Default" />
     <string name="Security">Security</string>
+    <string name="permission_required">Camera access is required to display the camera preview.</string>
+    <string name="ok">OK</string>
+    <string name="permission_granted">Permission is granted. You can use the camera now.</string>
+
     <string-array name="shared_keys">
         <item>Wep</item>
         <item>WPA2</item>
