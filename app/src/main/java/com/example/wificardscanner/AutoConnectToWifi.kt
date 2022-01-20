@@ -10,7 +10,7 @@ import android.net.wifi.WifiNetworkSuggestion
 
 class AutoConnectToWifi {
 
-    fun wifiConnect (ssid: String, password: String, context: Context) {
+    fun wifiConnect(ssid: String, password: String, context: Context) {
 
         val suggestion1 = WifiNetworkSuggestion.Builder()
             .setSsid(ssid)
@@ -40,21 +40,24 @@ class AutoConnectToWifi {
 
         val status = wifiManager.addNetworkSuggestions(suggestionsList);
         if (status != WifiManager.STATUS_NETWORK_SUGGESTIONS_SUCCESS) {
-            // do error handling here
-        }
+            Utils.showToast(context,
+                "NO Internet on targeted device or Incorrect credential")
 
 // Optional (Wait for post connection broadcast to one of your suggestions)
-        val intentFilter = IntentFilter(WifiManager.ACTION_WIFI_NETWORK_SUGGESTION_POST_CONNECTION);
+            val intentFilter =
+                IntentFilter(WifiManager.ACTION_WIFI_NETWORK_SUGGESTION_POST_CONNECTION);
 
-        val broadcastReceiver = object : BroadcastReceiver() {
-            override fun onReceive(context: Context, intent: Intent) {
-                if (!intent.action.equals(WifiManager.ACTION_WIFI_NETWORK_SUGGESTION_POST_CONNECTION)) {
-                    return;
+            val broadcastReceiver = object : BroadcastReceiver() {
+                override fun onReceive(context: Context, intent: Intent) {
+                    if (!intent
+                            .action
+                            .equals(WifiManager.ACTION_WIFI_NETWORK_SUGGESTION_POST_CONNECTION)) {
+                        return
+                    }
+                    Utils.showToast(context, "Connecting to WiFi")
                 }
-                // do post connect processing here
-            }
-        };
-        context.registerReceiver(broadcastReceiver, intentFilter);
-
+            };
+            context.registerReceiver(broadcastReceiver, intentFilter)
+        }
     }
 }

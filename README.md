@@ -9,7 +9,7 @@
 <h3 align="center">Wifi Card Scanner</h3>
 </div>
 
-
+ [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 <!-- TABLE OF CONTENTS -->
 <details>
@@ -31,6 +31,7 @@
     <li><a href="#roadmap">Roadmap</a></li>
     <li><a href="#contributing">Contributing</a></li>
     <li><a href="#resources">Resources</a></li>
+    <li><a href="#overall">Overall</a></li>
   </ol>
 </details>
 
@@ -41,7 +42,10 @@
 
 [![Product Name Screen Shot][product-screenshot]](https://example.com)
 
-App takes image using device built in camera and using Text API to collect Wifi SSID and Password then create WiFi QR code. Using On Device Recognition Version "text-recognition:17.0.1" or lower is FREE doesn't require FireBase registration.
+* App takes image using device built in camera and using Text API to collect Wifi SSID and Password then create WiFi QR code. 
+* Using On Device Recognition Version "text-recognition:17.0.1" or lower is FREE doesn't require FireBase registration.
+* Automatically connect to WiFi network using WifiManager API.
+* Manual input text capability to override incorrect or missing caracters.
 <p align="right">(<a href="#top">back to top</a>)</p>
 
 
@@ -82,19 +86,15 @@ To get a local copy up and running follow these simple example steps.
 
 - App is useful for Network Engineers dealing with multiple   WiFi     access point installations where network name and password different. Then able connect users by scanning WiFi QR without manually entering network details.
 - People struggling with modern devices (not technical).
-
-_For more examples, please refer to the [Documentation](https://developer.android.com/kotlin)_
-
 <p align="right">(<a href="#top">back to top</a>)</p>
 
 <!-- ROADMAP -->
 ## Roadmap
 
-- Option for copy/paste in text field
+- Add feature to input SSID and Pass manualy only
 - More work on code quality
 - Implement this code in Flater
 - Improve layer rotation
-- Request WiFi connection on device automaticly
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
@@ -108,12 +108,20 @@ Don't forget to give the project a star! Thanks again!
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
-<!-- Resources -->
+<!-- RESOURCES -->
 ## Resources
 
 * [Mlkit-text-recognition](https://developers.google.com/ml-kit/vision/text-recognition/android)
 * [Camera runtime permission](https://developer.android.com/codelabs/android-app-permissions#2)
 * [QR Code by Zxing](https://github.com/zxing/zxing)
+* [WifiManager](https://developer.android.com/guide/topics/connectivity/wifi-suggest)
+<p align="right">(<a href="#top">back to top</a>)</p>
+
+<!-- OVERALL -->
+## Overall
+
+Camera API uses low quality image so Optical character recognition (OCR) accuracy way lower than any cloud API depending on size of character and brightness. Using CameraX which gives ability to control image quality should improve accuracy.
+
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 

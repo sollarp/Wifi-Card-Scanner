@@ -3,6 +3,7 @@ package com.example.wificardscanner
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
@@ -22,6 +23,7 @@ import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.activity_main.*
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.text.Text
+import android.widget.Toast
 
 class MainActivity : AppCompatActivity() {
 
@@ -29,10 +31,9 @@ class MainActivity : AppCompatActivity() {
     private val generateQR = GenerateQR()
     private val textProcessor = TextProcessor()
     private val autoConnet = AutoConnectToWifi()
-    private var ssid = ""
-    private var password = ""
+    private var ssid = " "
+    private var password = " "
     private var preSharedKey = "WPA2"
-
     private lateinit var layout: View
     private lateinit var binding: ActivityMainBinding
 
@@ -47,6 +48,7 @@ class MainActivity : AppCompatActivity() {
             onClickRequestPermission(view)
         }
         submitButton.setOnClickListener {
+            getSet()
             generateQR()
         }
         // [Get list of items from strings.xml and adding array adapter to AutoCompleteTextView]
@@ -73,6 +75,15 @@ class MainActivity : AppCompatActivity() {
                 Log.i("Permission: ", "Denied")
             }
         }
+    private fun getSet() {
+        val inputTextSSID = findViewById<EditText>(R.id.autoCompleteTextView)
+        ssid = inputTextSSID.text.toString()
+        val inputTextPass = findViewById<EditText>(R.id.autoCompleteTextView2)
+        password = inputTextPass.text.toString()
+
+    }
+
+
     private fun onClickRequestPermission(view: View) {
         when {
             ContextCompat.checkSelfPermission(
@@ -165,10 +176,18 @@ class MainActivity : AppCompatActivity() {
             }
     }
     private fun generateQR () {
-        val qrImage = generateQR.generator(preSharedKey,ssid,password)
-        imageView.setImageBitmap(qrImage)
-        val context = applicationContext
-        autoConnet.wifiConnect(ssid, password, context)
+        if (ssid==" " || password==" " ) {
+            Toast.makeText(this@MainActivity,
+                "No SSID or Password was selected",
+                Toast.LENGTH_SHORT).show()
+        }else {
+            Toast.makeText(this@MainActivity, ssid, Toast.LENGTH_SHORT).show()
+            Toast.makeText(this@MainActivity, password, Toast.LENGTH_SHORT).show()
+            val qrImage = generateQR.generator(preSharedKey,ssid,password)
+            imageView.setImageBitmap(qrImage)
+            val context = applicationContext
+            autoConnet.wifiConnect(ssid, password, context)
+        }
     }
 }
 fun View.showSnackbar(
@@ -176,7 +195,7 @@ fun View.showSnackbar(
     msg: String,
     length: Int,
     actionMessage: CharSequence?,
-    action: (View) -> Unit
+    action: (View) -> Unit,
 ) {
     val snackbar = Snackbar.make(view, msg, length)
     if (actionMessage != null) {
@@ -185,6 +204,11 @@ fun View.showSnackbar(
         }.show()
     } else {
         snackbar.show()
+    }
+}
+object Utils {
+    fun showToast(mContext: Context?, message: String?) {
+        Toast.makeText(mContext, message, Toast.LENGTH_SHORT).show()
     }
 }
 
