@@ -82,8 +82,6 @@ class MainActivity : AppCompatActivity() {
         password = inputTextPass.text.toString()
 
     }
-
-
     private fun onClickRequestPermission(view: View) {
         when {
             ContextCompat.checkSelfPermission(
@@ -163,12 +161,10 @@ class MainActivity : AppCompatActivity() {
         autocompleteTV.onItemClickListener =
             AdapterView.OnItemClickListener { parent, view, position, id ->
                 ssid = parent.getItemAtPosition(position).toString()
-                //Toast.makeText(this@MainActivity, selectedItemText.toString(), Toast.LENGTH_SHORT).show()
             }
         val arrayAdapter2: ArrayAdapter<String> = ArrayAdapter(this, R.layout.dropdown_item, listItem)
         val autocompleteTV2 = findViewById<AutoCompleteTextView>(R.id.autoCompleteTextView2)
         autocompleteTV2.setAdapter(arrayAdapter2)
-
         autocompleteTV2.onItemClickListener =
             AdapterView.OnItemClickListener { parent, view, position, id ->
                 password = parent.getItemAtPosition(position).toString()
@@ -181,11 +177,10 @@ class MainActivity : AppCompatActivity() {
                 "No SSID or Password was selected",
                 Toast.LENGTH_SHORT).show()
         }else {
-            Toast.makeText(this@MainActivity, ssid, Toast.LENGTH_SHORT).show()
-            Toast.makeText(this@MainActivity, password, Toast.LENGTH_SHORT).show()
             val qrImage = generateQR.generator(preSharedKey,ssid,password)
             imageView.setImageBitmap(qrImage)
             val context = applicationContext
+            Thread.sleep(2000)
             autoConnet.wifiConnect(ssid, password, context)
         }
     }
@@ -206,7 +201,8 @@ fun View.showSnackbar(
         snackbar.show()
     }
 }
-object Utils {
+object Utils{
+
     fun showToast(mContext: Context?, message: String?) {
         Toast.makeText(mContext, message, Toast.LENGTH_SHORT).show()
     }
